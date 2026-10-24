@@ -1,0 +1,176 @@
+{
+  "verifiedAt": "2026-10-24T09:52:36.170Z",
+  "project": "同账 / Arc Split",
+  "stage": "local-wallet-and-real-Arc-testnet-verified",
+  "localUrl": "http://127.0.0.1:5178/",
+  "verification": {
+    "nodeTestsPassed": 25,
+    "staticBrowserChecksPassed": 15,
+    "localWalletBrowserChecksPassed": 12,
+    "realPaymentBrowserChecksPassed": 6,
+    "nativeWpfControlsValidated": 5,
+    "windowsAclChecksPassed": 3,
+    "runtimeAuditKnownVulnerabilities": 0
+  },
+  "arcStudio": {
+    "workspace": "https://studio.arc.io/app/7c4e4eec-0e7f-433b-ab84-b92b18606d70",
+    "sessionThread": "40887036-49f2-4eb4-b167-056613b16191",
+    "finalRevisionStatus": "completed",
+    "filesCompared": 27,
+    "matchingFiles": [
+      {
+        "file": "src/main.js",
+        "equal": true,
+        "sha256": "b594d715f42ee5bacf09ec4839722842c991efb1dc656c9602b537d80e4adf8f"
+      },
+      {
+        "file": "src/wallet.js",
+        "equal": true,
+        "sha256": "089d299ece279fd3e1920aeb8ae9dc0a2481bc3d4840a99c9cbf56d32c1a237b"
+      },
+      {
+        "file": "src/style.css",
+        "equal": true,
+        "sha256": "f57c6e3397aa6d2f40b7d5b057bf50edbcb28aaf1db0369d4e01a518fb1ef592"
+      },
+      {
+        "file": "src/split.js",
+        "equal": true,
+        "sha256": "198f205ba634fc79aa13bb54632d8d621e265b2fa9d2daabf428b841d8f7a5fe"
+      },
+      {
+        "file": "src/artifact.json",
+        "equal": true,
+        "sha256": "73b099648cda4a9a4b3ba88ed930a5c46d5c633aeecaab3d17e1a6739af16897"
+      },
+      {
+        "file": "index.html",
+        "equal": true,
+        "sha256": "8a0d7b62422c00418041b001df7c1bc45832df579eb717bb0c271291341b212c"
+      },
+      {
+        "file": "package.json",
+        "equal": true,
+        "sha256": "b304468b8300596430d1df6ee9d68b536e3c7713f947a6b0ae9b8ee3abe1b64c"
+      },
+      {
+        "file": "package-lock.json",
+        "equal": true,
+        "sha256": "2a683a48a5874b4d9e584579e8fe43660d252feb3478cbd94c8389e419286cde"
+      },
+      {
+        "file": "hardhat.config.js",
+        "equal": true,
+        "sha256": "b4fa906fe07cfa4f07c49eedae88d8602cc0a74272e680d9c2d2128836828b65"
+      },
+      {
+        "file": "contracts/ArcSplit.sol",
+        "equal": true,
+        "sha256": "2d39750bc08fa1801c34ed82db390494cd8a202b46e25c4b4c8428c764bb6ad4"
+      },
+      {
+        "file": "scripts/compile.mjs",
+        "equal": true,
+        "sha256": "b552b6dcf5aba543fce778d4aed3acd0b2eb449ce9bd775727af80d0a6b98213"
+      },
+      {
+        "file": "scripts/local-wallet.mjs",
+        "equal": true,
+        "sha256": "c3533dd9fb26d93b24f8e2be3f08950bbb46664cebd067abf20c7bf0b3aaadc1"
+      },
+      {
+        "file": "scripts/local-signing.mjs",
+        "equal": true,
+        "sha256": "ce79eeaac98994031de782166166c9d1ae3a1cfd4a9dd3e888e0abc743b9eb28"
+      },
+      {
+        "file": "scripts/local-app.mjs",
+        "equal": true,
+        "sha256": "6cadba2dea9e5b9892f21ed8ea8c3595610aaa639b174b7fdc0ece951ba4ee3b"
+      },
+      {
+        "file": "scripts/Create-LocalWallet.ps1",
+        "equal": true,
+        "sha256": "fefe424bb742f3f80885439bba0cadfd238ffb480202fd85ca87c665626d63d1"
+      },
+      {
+        "file": "scripts/Confirm-LocalTransaction.ps1",
+        "equal": true,
+        "sha256": "5ce5aa62c81eecdbd6b702665e50e614136177f203f605bf5b3c05c4dd26cd29"
+      },
+      {
+        "file": "Create-Local-Wallet.cmd",
+        "equal": true,
+        "sha256": "4b76903473f9377866af9b9cea699de364914eea9e5f29c023324286e9734bcd"
+      },
+      {
+        "file": "Open-Local-App.cmd",
+        "equal": true,
+        "sha256": "e7037541d02a97a45839bb02d298eb1d84c87d1b71887cf8fbf9abddf6489e82"
+      },
+      {
+        "file": "README.md",
+        "equal": true,
+        "sha256": "b6ffe15566d7863e2b00ad2429a3a64b4137facf198f33068abd713546a9f95a"
+      },
+      {
+        "file": "test/split.test.mjs",
+        "equal": true,
+        "sha256": "83fac3ff9d9e89b065c1adb3319a386856552de61009646cbef6054ca9ae93b7"
+      },
+      {
+        "file": "test/contract.test.mjs",
+        "equal": true,
+        "sha256": "0a807eddd74fc3698a03b53c314cf0c0db02fb036798d6d947e5fda8f063401a"
+      },
+      {
+        "file": "test/local-wallet.test.mjs",
+        "equal": true,
+        "sha256": "b1bcf18e338b0d49329969107196b07dfced0b3db2db5f498098aa1085b618a6"
+      },
+      {
+        "file": "test/local-signing.test.mjs",
+        "equal": true,
+        "sha256": "a1d9f2f5bd3ed859c4869a3258a96bfacee7449f28a1b6981f8eec28a7aa51ee"
+      },
+      {
+        "file": "test/local-client.test.mjs",
+        "equal": true,
+        "sha256": "5ed1dedd2e5a93b5e101f071a0e23e2077abb70362c0f0f65e9c5e88b2e8c50a"
+      },
+      {
+        "file": "test/browser-smoke.js",
+        "equal": true,
+        "sha256": "8fbf7d2e8b565808382e56298ba719d3f8d2f97ce397d69cce7fc286ccb47263"
+      },
+      {
+        "file": "test/browser-local-wallet.js",
+        "equal": true,
+        "sha256": "9bcdf921490042040e8a7ef4efd53c51421be310c62e3a964e4c35811a61ff80"
+      },
+      {
+        "file": "docs/testnet-deployment.json",
+        "equal": true,
+        "sha256": "c9d31da71a50cfade97efcca10fe4bafa6e9172d5b961f699228b111b09ec5d8"
+      }
+    ]
+  },
+  "chainEvidence": {
+    "deployment": "docs/testnet-deployment.json",
+    "split": "docs/testnet-split.json",
+    "mainnetTransaction": false
+  },
+  "custody": {
+    "passwordInput": "native Windows window only",
+    "privateKeyOutput": false,
+    "payerKeystore": "outside-repository",
+    "recipientKeystore": "outside-repository",
+    "payerBackupConfirmed": true,
+    "recipientBackupConfirmed": false
+  },
+  "externalStatus": {
+    "updatedExistingHostedSite": false,
+    "submittedHackathon": false,
+    "acceptedOrPaid": false
+  }
+}

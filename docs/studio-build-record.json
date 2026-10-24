@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-24",
+  "project": "同账 / Arc Split",
+  "recordScope": "Historical Studio revision before local-wallet integration. Later local changes are not covered by these file comparisons or deployment evidence.",
+  "sourceCommitAtPublication": "7a817bac590b24d6aa3c77c5d54c656d32412696",
+  "laterLocalWalletRevision": {
+    "status": "local-and-Arc-testnet-verified",
+    "syncedToStudio": true,
+    "published": false,
+    "testnetDeploymentVerified": true,
+    "testnetSplitVerified": true,
+    "mainnetSigned": false,
+    "verificationRecord": "docs/local-wallet-verification.json"
+  },
+  "studioWorkspace": "https://studio.arc.io/app/7c4e4eec-0e7f-433b-ab84-b92b18606d70",
+  "studioStatus": "completed",
+  "chainDeployments": [],
+  "localIndependentVerification": {
+    "nodeTests": 16,
+    "browserChecks": 15,
+    "testedViewports": [
+      "1440x1080",
+      "390x844"
+    ],
+    "runtimeAuditKnownVulnerabilities": 0,
+    "readonlyRpcChainIds": {
+      "mainnet": 5042,
+      "testnet": 5042002
+    }
+  },
+  "provenance": "Local preparation and independent tests plus three real Arc Studio build/revision turns. No claim of independent-from-scratch Studio authorship. Core files pulled from Studio were compared byte for byte.",
+  "matchingFiles": [
+    {
+      "file": "src/main.js",
+      "equal": true,
+      "sha256": "a4c461896982e2a6510cdf0e08b8429a72903459ce050a5dbc90dcee394f21ec"
+    },
+    {
+      "file": "src/wallet.js",
+      "equal": true,
+      "sha256": "4e4bcb90339dc890e450a7ea24ef64130e2697fc3c1b9f2174b061d2ae54a0f4"
+    },
+    {
+      "file": "src/split.js",
+      "equal": true,
+      "sha256": "198f205ba634fc79aa13bb54632d8d621e265b2fa9d2daabf428b841d8f7a5fe"
+    },
+    {
+      "file": "src/style.css",
+      "equal": true,
+      "sha256": "bce702e630e01f2be79c1a3b6d7ac7a9f8b4c078aba3d3e6ad9049cadfba8171"
+    },
+    {
+      "file": "src/artifact.json",
+      "equal": true,
+      "sha256": "73b099648cda4a9a4b3ba88ed930a5c46d5c633aeecaab3d17e1a6739af16897"
+    },
+    {
+      "file": "contracts/ArcSplit.sol",
+      "equal": true,
+      "sha256": "2d39750bc08fa1801c34ed82db390494cd8a202b46e25c4b4c8428c764bb6ad4"
+    },
+    {
+      "file": "scripts/compile.mjs",
+      "equal": true,
+      "sha256": "b552b6dcf5aba543fce778d4aed3acd0b2eb449ce9bd775727af80d0a6b98213"
+    },
+    {
+      "file": "package.json",
+      "equal": true,
+      "sha256": "2457ab6169ffdc19a26938d348e638519c429365f7f4dd8f0f41b48229f0a20a"
+    },
+    {
+      "file": "test/contract.test.mjs",
+      "equal": true,
+      "sha256": "0a807eddd74fc3698a03b53c314cf0c0db02fb036798d6d947e5fda8f063401a"
+    },
+    {
+      "file": "test/split.test.mjs",
+      "equal": true,
+      "sha256": "83fac3ff9d9e89b065c1adb3319a386856552de61009646cbef6054ca9ae93b7"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "status": "success",
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "transactionHash": "0xa4d5c52f36a6186a0a45f87cd433da395bde1a1e4b4c620dd5a4c7da14951ae7",
+  "contract": "0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622",
+  "payer": "0x34600E8FEDa068d265bD753F4aDE869f0BD28c18",
+  "recipient": "0xc3908a3740a35161b7204DE8a024b9DbB3e77a5c",
+  "totalUSDC": "0.01",
+  "payouts": [
+    {
+      "address": "0x34600E8FEDa068d265bD753F4aDE869f0BD28c18",
+      "USDC": "0.007"
+    },
+    {
+      "address": "0xc3908a3740a35161b7204DE8a024b9DbB3e77a5c",
+      "USDC": "0.003"
+    }
+  ],
+  "note": "同账测试网分账验证",
+  "referenceId": "0x0ac389c87996a4e4c955f258629a69c6f077004b37110360fe422aa511e4b7da",
+  "blockNumber": "68841160",
+  "feeUSDC": "0.0024318",
+  "payerBalanceUSDC": "19.983446025",
+  "recipientBalanceUSDC": "0.003",
+  "exactBalanceChangesVerified": true,
+  "contractBalanceUSDC": "0",
+  "mainnetEvidence": false,
+  "verifiedAt": "2026-10-24T09:48:30.557Z"
+}

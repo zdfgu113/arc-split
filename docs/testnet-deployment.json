@@ -1,0 +1,14 @@
+{
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "account": "0x34600E8FEDa068d265bD753F4aDE869f0BD28c18",
+  "contract": "0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622",
+  "transactionHash": "0x1503f367d5400756b57676edf04173258edac31378626323b219e97945135db7",
+  "blockNumber": "68839201",
+  "status": "success",
+  "feeUSDC": "0.011122175",
+  "runtimeCodeMatchesLocalArtifact": true,
+  "approval": "Wallet owner confirmed the exact testnet transaction in the local native window.",
+  "verifiedAt": "2026-10-24T09:33:07.916Z",
+  "mainnetEvidence": false
+}

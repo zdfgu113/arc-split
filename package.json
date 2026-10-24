@@ -1,0 +1,31 @@
+{
+  "name": "arc-split",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "compile": "node scripts/compile.mjs",
+    "test": "node --test test/*.test.mjs",
+    "build": "npm run compile && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "local": "npm run build && node scripts/local-app.mjs"
+  },
+  "dependencies": {
+    "ethers": "6.17.0",
+    "viem": "2.57.11"
+  },
+  "devDependencies": {
+    "hardhat": "3.21.0",
+    "solc": "0.8.38",
+    "vite": "8.3.5"
+  },
+  "overrides": {
+    "abitype": {
+      "zod": "4.6.6"
+    },
+    "solc": {
+      "tmp": "0.2.7"
+    }
+  }
+}
