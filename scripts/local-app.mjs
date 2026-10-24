@@ -6,7 +6,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { walletAddress, defaultKeystore } from './local-wallet.mjs';
-import { inspectRequest, validateIntent, readSigned, publicFailure, LocalSigningError } from './local-signing.mjs';
+import { inspectRequest, validateIntent, readSigned, publicFailure, LocalSigningError, checkMainnetBudget } from './local-signing.mjs';
 import { publicClient } from '../src/wallet.js';
 
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -76,6 +76,7 @@ export function createLocalServer({ dist = root, file = defaultKeystore, approve
           const client = getClient(details.mode);
           const intent = { ...input, nonce: await client.getTransactionCount({ address, blockTag: 'pending' }), expiresAt: Date.now() + 10 * 60_000 };
           const { summary } = await validateIntent(intent, address, client);
+          await checkMainnetBudget(file, details);
           const result = await approve({ intent, summary });
           json(200, { ok: true, ...result });
         } finally { signing = false; }

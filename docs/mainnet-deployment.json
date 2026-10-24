@@ -1,0 +1,17 @@
+{
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "account": "0x34600E8FEDa068d265bD753F4aDE869f0BD28c18",
+  "contract": "0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622",
+  "transactionHash": "0x222809b64072df83f66d2fb46ebb9b932ae0b876907e708603b316c073653a1b",
+  "blockNumber": "27634633",
+  "blockTimestamp": "2026-10-24T13:57:50.000Z",
+  "status": "success",
+  "feeUSDC": "0.011122175",
+  "payerBalanceUSDC": "1.988877825",
+  "runtimeCodeMatchesLocalArtifact": true,
+  "exactBalanceChangeVerified": true,
+  "approval": "Wallet owner confirmed this exact mainnet deployment in the local native window.",
+  "verifiedAt": "2026-10-24T13:59:50.441Z",
+  "mainnetEvidence": true
+}

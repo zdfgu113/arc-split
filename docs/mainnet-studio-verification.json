@@ -1,0 +1,149 @@
+{
+  "verifiedAt": "2026-10-24T14:20:52.046Z",
+  "studioWorkspace": "https://studio.arc.io/app/7c4e4eec-0e7f-433b-ab84-b92b18606d70",
+  "revision": 6,
+  "studioStatus": "completed",
+  "studioReportedNodeTests": 28,
+  "studioReportedBuildPassed": true,
+  "localIndependentNodeTests": 28,
+  "matchingFiles": [
+    {
+      "file": "README.md",
+      "equal": true,
+      "sha256": "259e50c180b5635d85c369da128da2cbe961877c9a9db421bf03b12eaf39d5bb"
+    },
+    {
+      "file": "contracts/ArcSplit.sol",
+      "equal": true,
+      "sha256": "2d39750bc08fa1801c34ed82db390494cd8a202b46e25c4b4c8428c764bb6ad4"
+    },
+    {
+      "file": "docs/mainnet-deployment.json",
+      "equal": true,
+      "sha256": "cf41fc081d4174793a2576bc1d3e7aefe479a24fc5b0a69bbcc2f55806fd5ec7"
+    },
+    {
+      "file": "docs/mainnet-split.json",
+      "equal": true,
+      "sha256": "5dcd87885fd65f6362866f296da479f5210d046d45a9c343e5886e0536fd6400"
+    },
+    {
+      "file": "hardhat.config.js",
+      "equal": true,
+      "sha256": "2b7baba04d740229927bd56702b65e5c8d97c4df6b57e3269a301fae8e35e61d"
+    },
+    {
+      "file": "index.html",
+      "equal": true,
+      "sha256": "a9ad541f0cba177c471f606523ec597907ba12275999f2fe0e51520efc6ef62d"
+    },
+    {
+      "file": "package-lock.json",
+      "equal": true,
+      "sha256": "2a683a48a5874b4d9e584579e8fe43660d252feb3478cbd94c8389e419286cde"
+    },
+    {
+      "file": "package.json",
+      "equal": true,
+      "sha256": "b304468b8300596430d1df6ee9d68b536e3c7713f947a6b0ae9b8ee3abe1b64c"
+    },
+    {
+      "file": "scripts/Confirm-LocalTransaction.ps1",
+      "equal": true,
+      "sha256": "5ce5aa62c81eecdbd6b702665e50e614136177f203f605bf5b3c05c4dd26cd29"
+    },
+    {
+      "file": "scripts/Create-LocalWallet.ps1",
+      "equal": true,
+      "sha256": "fefe424bb742f3f80885439bba0cadfd238ffb480202fd85ca87c665626d63d1"
+    },
+    {
+      "file": "scripts/compile.mjs",
+      "equal": true,
+      "sha256": "b552b6dcf5aba543fce778d4aed3acd0b2eb449ce9bd775727af80d0a6b98213"
+    },
+    {
+      "file": "scripts/local-app.mjs",
+      "equal": true,
+      "sha256": "16f89d37ca44df3516949bf015a9534a75fb6f082dc366740585c9a58abb17c2"
+    },
+    {
+      "file": "scripts/local-signing.mjs",
+      "equal": true,
+      "sha256": "5f2556c907532bb44c4248167359b251a164e0703cf8c52dbf86017432b001a9"
+    },
+    {
+      "file": "scripts/local-wallet.mjs",
+      "equal": true,
+      "sha256": "c3533dd9fb26d93b24f8e2be3f08950bbb46664cebd067abf20c7bf0b3aaadc1"
+    },
+    {
+      "file": "scripts/mainnet-preflight.mjs",
+      "equal": true,
+      "sha256": "4c9436e9760e54c64c919aac331abbe345a65ac0eded891840d5098790b60d1d"
+    },
+    {
+      "file": "src/artifact.json",
+      "equal": true,
+      "sha256": "73b099648cda4a9a4b3ba88ed930a5c46d5c633aeecaab3d17e1a6739af16897"
+    },
+    {
+      "file": "src/main.js",
+      "equal": true,
+      "sha256": "bdfba4d202f88def57ebb2d96b2269b672eeccb12798084036675815e87021a8"
+    },
+    {
+      "file": "src/split.js",
+      "equal": true,
+      "sha256": "198f205ba634fc79aa13bb54632d8d621e265b2fa9d2daabf428b841d8f7a5fe"
+    },
+    {
+      "file": "src/style.css",
+      "equal": true,
+      "sha256": "f57c6e3397aa6d2f40b7d5b057bf50edbcb28aaf1db0369d4e01a518fb1ef592"
+    },
+    {
+      "file": "src/wallet.js",
+      "equal": true,
+      "sha256": "70136e94edfbd99a58aa64e0323d588ed1387b63f528988e7df97e19632a1c03"
+    },
+    {
+      "file": "test/browser-local-wallet.js",
+      "equal": true,
+      "sha256": "9bcdf921490042040e8a7ef4efd53c51421be310c62e3a964e4c35811a61ff80"
+    },
+    {
+      "file": "test/browser-smoke.js",
+      "equal": true,
+      "sha256": "8fbf7d2e8b565808382e56298ba719d3f8d2f97ce397d69cce7fc286ccb47263"
+    },
+    {
+      "file": "test/contract.test.mjs",
+      "equal": true,
+      "sha256": "0a807eddd74fc3698a03b53c314cf0c0db02fb036798d6d947e5fda8f063401a"
+    },
+    {
+      "file": "test/local-client.test.mjs",
+      "equal": true,
+      "sha256": "5ed1dedd2e5a93b5e101f071a0e23e2077abb70362c0f0f65e9c5e88b2e8c50a"
+    },
+    {
+      "file": "test/local-signing.test.mjs",
+      "equal": true,
+      "sha256": "cd4e059e2ccbd74ad8886d9ae2153bae2f966c442d557c9868f0aa0f64f3406a"
+    },
+    {
+      "file": "test/local-wallet.test.mjs",
+      "equal": true,
+      "sha256": "b1bcf18e338b0d49329969107196b07dfced0b3db2db5f498098aa1085b618a6"
+    },
+    {
+      "file": "test/split.test.mjs",
+      "equal": true,
+      "sha256": "83fac3ff9d9e89b065c1adb3319a386856552de61009646cbef6054ca9ae93b7"
+    }
+  ],
+  "snapshotScope": "These 27 files matched byte for byte when pulled after Studio revision 6. Later publication notes and media are separate.",
+  "mainnetSignatures": "Owner signed in the local Windows wallet, not in Studio.",
+  "provenance": "Local preparation, independent tests, and six real Arc Studio build/revision turns."
+}

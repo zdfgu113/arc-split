@@ -4,6 +4,7 @@ import artifact from './artifact.json' with { type: 'json' };
 import { NATIVE_PER_MICRO } from './split.js';
 
 export const chains = { testnet: arcTestnet, mainnet: arc };
+export const MAINNET_BUDGET_WEI = 5n * 10n ** 18n;
 export const publicClient = mode => createPublicClient({ chain: chains[mode], transport: http(chains[mode].rpcUrls.default.http[0], { timeout: 15_000, retryCount: 1 }) });
 export const localAvailable = () => typeof document !== 'undefined' && document.querySelector('meta[name="arc-local-wallet"]')?.content === 'enabled';
 async function localRequest(path, body = {}) {
@@ -78,6 +79,7 @@ export async function prepare(mode, account, address, plan, referenceId, note) {
   const gas = (await client.estimateContractGas(request)) * 120n / 100n;
   const fees = await feeParameters(client);
   const maxFee = gas * fees.maxFeePerGas;
+  if (mode === 'mainnet' && value + maxFee > MAINNET_BUDGET_WEI) throw new Error('本笔主网最高支出超过本次授权的 5 USDC 预算。');
   if (await client.getBalance({ address: account }) < value + maxFee) throw new Error('USDC 余额不足，需同时覆盖分账总额与网络费用。');
   const fromBlock = await client.getBlockNumber();
   return { mode, account, contract, referenceId, plan, note, fromBlock, request: { ...request, gas, ...fees }, maxFee };
@@ -120,20 +122,26 @@ export async function findPayment(entry) {
   return { hash, receipt: await client.getTransactionReceipt({ hash }) };
 }
 
-export async function deployTestnet(account, onSubmitted) {
-  await assertWallet('testnet', account);
-  const client = publicClient('testnet');
-  if (await client.getChainId() !== arcTestnet.id) throw new Error('测试网 RPC 返回了错误的网络。');
+export async function deploy(mode, account, onSubmitted) {
+  if (typeof mode !== 'string' || !Object.hasOwn(chains, mode)) throw new Error('请选择 Arc 测试网或主网。');
+  await assertWallet(mode, account);
+  const chain = chains[mode];
+  const client = publicClient(mode);
+  if (await client.getChainId() !== chain.id) throw new Error('部署 RPC 返回了错误的网络。');
+  const balance = await client.getBalance({ address: account });
+  if (balance === 0n) throw new Error(`${mode === 'testnet' ? '测试网' : '主网'} USDC 余额为零，请先确认正确网络的入金已到账。`);
   const fees = await feeParameters(client);
   const gas = (await client.estimateGas({ account, data: artifact.bytecode })) * 120n / 100n;
-  if (await client.getBalance({ address: account }) < gas * fees.maxFeePerGas) throw new Error('测试网 USDC 不足以支付部署费用。');
+  const maxFee = gas * fees.maxFeePerGas;
+  if (mode === 'mainnet' && maxFee > MAINNET_BUDGET_WEI) throw new Error('主网部署费用上限超过本次授权的 5 USDC 预算。');
+  if (balance < maxFee) throw new Error(`${mode === 'testnet' ? '测试网' : '主网'} USDC 不足以支付部署费用。`);
   const hash = localAvailable()
-    ? (await localTransaction('testnet', account, { data: artifact.bytecode, gas, ...fees })).hash
-    : await createWalletClient({ chain: arcTestnet, transport: custom(provider()) }).deployContract({ account, abi: artifact.abi, bytecode: artifact.bytecode, gas, ...fees });
+    ? (await localTransaction(mode, account, { data: artifact.bytecode, gas, ...fees })).hash
+    : await createWalletClient({ chain, transport: custom(provider()) }).deployContract({ account, abi: artifact.abi, bytecode: artifact.bytecode, gas, ...fees });
   onSubmitted(hash);
   const receipt = await client.waitForTransactionReceipt({ hash, timeout: 90_000 });
-  if (receipt.status !== 'success' || !receipt.contractAddress) throw new Error('测试合约部署未成功，请检查交易记录。');
-  return checkContract('testnet', receipt.contractAddress);
+  if (receipt.status !== 'success' || !receipt.contractAddress) throw new Error('合约部署未成功，请检查交易记录。');
+  return checkContract(mode, receipt.contractAddress);
 }
 
 export const isUserRejection = error => error.code === 4001 || error.cause?.code === 4001 || /User rejected|User denied/i.test(error.message ?? '');

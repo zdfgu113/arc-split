@@ -62,6 +62,9 @@ function refresh() {
   $('#receipt-network').textContent = mode === 'demo' ? '仅演示 · 不发送资产' : wallet.chains[mode].name;
   $('#payment-help').textContent = pending ? '请在付款记录中检查上一笔交易，避免重复付款。' : mode === 'demo' ? '先看清明细，再决定付款。' : contracts[mode] ? '先模拟验证，确认后由钱包请求你签名。' : '真实付款前，请在「合约设置」中配置合约。';
   $('#wallet-button').innerHTML = account ? `${wallet.localAvailable() ? '本机 · ' : ''}${account.slice(0, 6)}…${account.slice(-4)}` : `${wallet.localAvailable() ? '连接本机钱包' : '连接钱包'} <span aria-hidden="true">↗</span>`;
+  $('#deploy-contract').textContent = mode === 'mainnet' ? '用钱包部署主网合约' : '用钱包部署测试网合约';
+  $('#deploy-contract').disabled = busy || mode === 'demo';
+  $('#deployment-hint').textContent = mode === 'mainnet' ? `主网部署使用真实 USDC，由钱包逐笔显示费用并请求确认。${wallet.localAvailable() ? '本次本机签名累计预算上限为 5 USDC。' : '本笔最高支出上限为 5 USDC。'}` : '需要测试网 USDC。部署将由你的钱包显示费用并请求确认。';
 }
 
 function renderHistory() {
@@ -193,18 +196,24 @@ $('#save-contract').addEventListener('click', async () => {
   setBusy(true); try { contracts[mode] = await wallet.checkContract(mode, $('#contract-address').value.trim()); store('arc-split-contracts-v1', contracts); $('#settings-dialog').close(); toast('合约代码与网络已核实，地址已保存。'); } catch (e) { toast(wallet.friendlyError(e)); } finally { setBusy(false); }
 });
 $('#deploy-contract').addEventListener('click', async () => {
-  if (mode !== 'testnet') { toast('请先切换到 Arc 测试网；此处不部署主网合约。'); return; }
-  if (!account) { toast('请先关闭设置并连接测试网钱包。'); return; }
+  if (mode === 'demo') { toast('请先选择 Arc 测试网或主网。'); return; }
+  if (!account) { toast('请先关闭设置并连接所选网络的钱包。'); return; }
+  const network = mode, payer = account;
+  const pendingKey = `arc-split-pending-deploy-${network}-v1`;
   setBusy(true);
   try {
     let address;
-    const pending = readStore('arc-split-pending-deploy-v1', null);
+    let pending = readStore(pendingKey, null);
+    if (network === 'testnet' && !pending) {
+      pending = readStore('arc-split-pending-deploy-v1', null);
+      if (pending?.hash) { store(pendingKey, pending); store('arc-split-pending-deploy-v1', null); }
+    }
     if (pending?.hash) {
-      const receipt = await wallet.publicClient('testnet').getTransactionReceipt({ hash: pending.hash });
-      if (receipt.status !== 'success') { store('arc-split-pending-deploy-v1', null); throw new Error('上次部署已回滚，可以再次部署。'); }
-      address = await wallet.checkContract('testnet', receipt.contractAddress);
-    } else address = await wallet.deployTestnet(account, hash => { store('arc-split-pending-deploy-v1', { hash }); toast('部署交易已提交，正在等待确认；请勿重复部署。'); });
-    contracts.testnet = address; store('arc-split-contracts-v1', contracts); store('arc-split-pending-deploy-v1', null); $('#contract-address').value = address; toast('测试网合约已部署并核实，地址已保存。');
+      const receipt = await wallet.publicClient(network).getTransactionReceipt({ hash: pending.hash });
+      if (receipt.status !== 'success') { store(pendingKey, null); throw new Error('上次部署已回滚，请先核对本机签名与预算记录。'); }
+      address = await wallet.checkContract(network, receipt.contractAddress);
+    } else address = await wallet.deploy(network, payer, hash => { store(pendingKey, { hash }); toast('部署交易已提交，正在等待确认；请勿重复部署。'); });
+    contracts[network] = address; store('arc-split-contracts-v1', contracts); store(pendingKey, null); $('#contract-address').value = address; toast(`${network === 'mainnet' ? '主网' : '测试网'}合约已部署并核实，地址已保存。`);
   } catch (e) { toast(wallet.friendlyError(e)); } finally { await refreshLocalBalance(); setBusy(false); }
 });
 

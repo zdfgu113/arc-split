@@ -2,7 +2,7 @@
 
 Native USDC payment splitting for small teams, with exact integer allocation, transaction simulation and verified onchain receipts. / 面向小团队的原生 USDC 分账工具，支持整数精度分配、发送前模拟和链上收据核验。
 
-**Verified on Arc Testnet. Mainnet deployment is pending. / 已在 Arc 测试网实测，主网部署待完成。**
+**Verified on Arc Mainnet: a real 1.98 USDC split. / 已在 Arc 主网完成真实的 1.98 USDC 分账。**
 
 为小团队准备的 Arc 原生 USDC 分账应用。输入总额与成员比例，核对完整收款地址，一笔交易结清 2–10 位成员。
 
@@ -10,14 +10,20 @@ Native USDC payment splitting for small teams, with exact integer allocation, tr
 
 - [Source repository / 公开源码](https://github.com/zdfgu113/arc-split)
 - [Arc Studio project / Studio 项目](https://studio.arc.io/app/7c4e4eec-0e7f-433b-ab84-b92b18606d70)
+- [Mainnet contract / 主网合约](https://explorer.arc.io/address/0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622)
+- [Verified 1.98 USDC mainnet split / 已核实的 1.98 USDC 主网分账](https://explorer.arc.io/tx/0x14532a73217a7fbc886ca202f53b7a659c165b9abc82c99f5d015b1439b0e704)
 - [Testnet contract / 测试网合约](https://explorer.testnet.arc.io/address/0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622)
 - [Verified 0.01 USDC split / 已核实的 0.01 USDC 测试网分账](https://explorer.testnet.arc.io/tx/0xa4d5c52f36a6186a0a45f87cd433da395bde1a1e4b4c620dd5a4c7da14951ae7)
 
-The payment returned 0.007 test USDC to the payer and sent 0.003 test USDC to a separately controlled recipient wallet. Both payouts, the contract event and exact balance changes were independently checked. / 本次付款向付款钱包返还 0.007 测试 USDC，并向另一个本人控制的收款钱包发送 0.003 测试 USDC；两笔金额、合约事件和精确余额变化均已独立核验。
+The mainnet payment returned 1.386 USDC to the payer and sent 0.594 USDC to a separate owner-controlled recipient wallet. The successful receipt, exact event fields, deployed code and both balance changes were independently checked against Arc Mainnet, chain 5042. Deployment and payment consumed 0.013553375 USDC in total network fees. / 主网付款向付款钱包返还 1.386 USDC，并向另一个本人控制的收款钱包发送 0.594 USDC。成功收据、完整事件字段、合约代码及双方余额变化均已在编号 5042 的 Arc 主网上独立核验；部署与付款的网络费用合计 0.013553375 USDC。
 
-25 Node tests passed. A 27-file application and verification-source snapshot was downloaded from Arc Studio and matched the tested local version byte for byte. Publication documentation, demo assets and the standalone HTTP-test fixture were added afterward; core application and signing logic are unchanged. / 25 项 Node 测试通过，从 Arc Studio 下载的一个包含 27 个应用及验证源码文件的快照与当时的本地测试版本逐字节一致；公开说明、演示素材及独立 HTTP 测试夹具随后补充，应用及签名核心逻辑保持一致。
+The earlier testnet payment split 0.01 test USDC into 0.007 and 0.003. Both networks' evidence is retained separately in `docs/`. / 此前的测试网付款将 0.01 测试 USDC 分为 0.007 与 0.003；两个网络的证据分别保存在 `docs/`。
 
-![Arc Testnet split completed / Arc 测试网分账完成](docs/images/testnet-demo.png)
+28 Node tests passed. An earlier 27-file testnet application snapshot matched Arc Studio byte for byte. Publication assets and the owner-authorized mainnet preparation with a cumulative five-USDC local signing cap followed that snapshot. Historical build records refer to their stated versions. / 28 项 Node 测试通过；此前包含 27 个文件的测试网应用快照曾与 Arc Studio 逐字节一致。公开素材及本人授权、累计 5 USDC 上限的主网准备是在该快照之后完成的，历史构建记录对应各自注明的版本。
+
+The sixth Studio revision also reported 28 passing tests and a successful build; its 27-file snapshot was independently compared byte for byte. See `docs/mainnet-studio-verification.json`. / 第六轮 Studio 修订也报告 28 项测试与构建通过，其 27 个文件的快照已独立逐字节比对，详见 `docs/mainnet-studio-verification.json`。
+
+![Arc Mainnet split completed / Arc 主网分账完成](docs/images/mainnet-demo.png)
 
 ## 已实现
 
@@ -28,7 +34,7 @@ The payment returned 0.007 test USDC to the payer and sent 0.003 test USDC to a 
 - 只有交易成功且合约事件中的付款人、编号、金额、收款地址和备注匹配，才标记已付款。
 - 超时保留待核状态，通过只读查询检查；不自动发起替代付款。
 - 手机界面、键盘操作、减少动态效果、浏览器本地记录。
-- 支持浏览器钱包与本机加密钱包。测试网部署和付款都需本人确认；不自动部署主网。
+- 支持浏览器钱包与本机加密钱包。所选 Arc 网络的部署和付款都需本人逐笔确认。
 
 ## 启动与验证
 
@@ -61,7 +67,7 @@ npx --yes --package @playwright/cli playwright-cli -s=arc-static run-code --file
 4. 为每位成员填写实际控制的测试网收款地址与比例，先用小额验证。
 5. 核对预览和完整地址，确认后在钱包中签名。应用取得成功收据并验证事件后才显示完成。
 
-主网使用需另行核验收款与参赛资格、准备资金、由用户部署合约及完成真实小额交易。本轮没有执行这些操作。没有主网交易哈希时，不得把演示记录用于参赛付款证据。
+2026-10-24 已由钱包本人在本机窗口逐笔确认主网部署和 1.98 USDC 分账，证据分别见 `docs/mainnet-deployment.json` 与 `docs/mainnet-split.json`。这次实测不代表主办方已经认可参赛或领奖资格。
 
 ## 本机加密钱包
 
@@ -97,7 +103,15 @@ node scripts/local-wallet.mjs address
 2. 在合约设置中选择部署测试网合约。本机确认窗口显示网络编号、付款账户、费用上限与总支出上限；本人核对、勾选并输入创建钱包时的密码。
 3. 填入自己控制的收款地址后预览分账。每次付款都会打开新的本机确认窗口，逐项显示全部完整地址与金额；密码不进入网页，也不交给常驻 HTTP 服务。
 
-本机服务仅绑定 `127.0.0.1:5178`，校验 Host、精确 Origin、会话 Cookie、JSON 类型与专用请求头，不开放 CORS 或通用签名接口。签名子进程独立核查 Arc 网络、合约字节码、分账参数、余额、模拟结果、交易序号与有效期。只允许当前合约的分账功能和测试网当前版本合约的部署。
+本机服务仅绑定 `127.0.0.1:5178`，校验 Host、精确 Origin、会话 Cookie、JSON 类型与专用请求头，不开放 CORS 或通用签名接口。签名子进程独立核查 Arc 网络、合约字节码、分账参数、余额、模拟结果、交易序号与有效期。只允许当前合约的分账功能及当前版本合约的部署。
+
+### 本次主网验证预算
+
+本人已授权最多 5 USDC 的主网验证预算。本机签名器按每笔交易的转出金额与最高网络费保守预留，累计检查钱包目录中 `nonce-mainnet-地址-序号.public.json` 的 `reservedCostWei`。已签名但尚未核实的交易仍占用预算；重取同一交易哈希不重复预留。不要删除或修改这些记录来绕过预算。
+
+这个上限约束本机签名器；浏览器扩展钱包路径按每笔最高支出 5 USDC 检查，并由钱包本人确认。外部钱包持钥人、入金链的手续费和跨链提供商的费用不能由此本机记录控制。本次主网实测实际入金 2 USDC，分账总额 1.98 USDC，实际网络费用另见已核实的链上记录。
+
+`node scripts/mainnet-preflight.mjs` 仅查询主网网络、余额和费用，并尝试使用临时余额覆盖做只读 Gas 估算；不解锁、不签名、不广播。预估费用会变化，最终以入金后的实时估算和本人确认窗口为准。
 
 交易哈希在广播前写入钱包目录的 `signed-*.public.json`，相同付款编号可恢复原哈希。`nonce-*.public.json` 防止另一笔意图替换尚未核实的签名。**不要删除这些记录来尝试重复付款。** 如果广播结果不明，应用保留待核状态；当前版本不保存原始签名交易用于重播，需要人工核查后处理。交易记录不是钱包恢复材料，仍须保留加密钱包与密码。
 
@@ -126,7 +140,7 @@ node scripts/local-wallet.mjs address
 
 已经核实的真实测试网合约部署见 `docs/testnet-deployment.json`。这些测试币没有真实货币价值，测试网部署不满足活动的主网付款要求。
 
-当前不是一份已经提交或获批的资助申请。符合活动要求的公开应用、包含主网交易的演示视频、真实主网交易、领奖资格和正式申请仍需完成。
+当前不是一份已经提交或获批的资助申请。主网部署和真实分账已核实；公开应用、包含主网交易的演示视频、领奖资格和正式申请仍需完成。
 
 ## 范围与已知限制
 

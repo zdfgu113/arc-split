@@ -6,9 +6,9 @@ import { join } from 'node:path';
 import { request as httpRequest } from 'node:http';
 import { network } from 'hardhat';
 import { createPublicClient, createWalletClient, custom, encodeFunctionData, keccak256, toHex } from 'viem';
-import { arcTestnet } from 'viem/chains';
+import { arc, arcTestnet } from 'viem/chains';
 import { createLocalWallet } from '../scripts/local-wallet.mjs';
-import { inspectRequest, validateIntent, signAndSubmit, readSigned, publicFailure, LocalSigningError } from '../scripts/local-signing.mjs';
+import { inspectRequest, validateIntent, signAndSubmit, readSigned, publicFailure, LocalSigningError, checkMainnetBudget, approvalText } from '../scripts/local-signing.mjs';
 import { createLocalServer } from '../scripts/local-app.mjs';
 import artifact from '../src/artifact.json' with { type: 'json' };
 import { verifyReceipt } from '../src/wallet.js';
@@ -18,9 +18,9 @@ const password = 'temporary-local-evm-test-only';
 const fees = { gas: '1000000', maxFeePerGas: '20000000000', maxPriorityFeePerGas: '1000000000' };
 const deploy = () => ({ mode: 'testnet', account, data: artifact.bytecode, value: '0', ...fees });
 const payment = (ref = 'test-local-signing') => ({ mode: 'testnet', account, to: contract, data: encodeFunctionData({ abi: artifact.abi, functionName: 'split', args: [recipients, [700_000_000_000_000_000n, 300_000_000_000_000_000n], keccak256(toHex(ref)), '本机钱包测试'] }), value: '1000000000000000000', ...fees });
-const envelope = async input => {
-  const intent = { ...input, nonce: await client.getTransactionCount({ address: account, blockTag: 'pending' }), expiresAt: Date.now() + 9 * 60_000 };
-  return { intent, summary: (await validateIntent(intent, account, client)).summary, password };
+const envelope = async (input, rpc = client, owner = account) => {
+  const intent = { ...input, nonce: await rpc.getTransactionCount({ address: owner, blockTag: 'pending' }), expiresAt: Date.now() + 9 * 60_000 };
+  return { intent, summary: (await validateIntent(intent, owner, rpc)).summary, password };
 };
 before(async () => {
   directory = await mkdtemp(join(tmpdir(), 'arc-signer-test-')); file = join(directory, 'ephemeral.json');
@@ -42,11 +42,12 @@ test('signing policy refuses arbitrary calls, networks, altered amounts and unsa
   const valid = payment();
   assert.equal(inspectRequest(valid, account).kind, 'split');
   for (const changed of [
-    { mode: 'demo' }, { mode: '__proto__' }, { account: recipients[0] }, { value: '999' }, { data: '0x12345678' },
+    { mode: 'demo' }, { mode: '__proto__' }, { mode: ['mainnet'] }, { mode: ['testnet'] }, { mode: {} }, { account: recipients[0] }, { value: '999' }, { data: '0x12345678' },
     { gas: '20999' }, { maxFeePerGas: '19999999999' }, { maxFeePerGas: '1000000000001' }, { maxPriorityFeePerGas: '21000000000' },
     { data: valid.data + '00' }, { password: 'must-never-enter-the-api' }, { rpcUrl: 'https://example.com' },
   ]) assert.throws(() => inspectRequest({ ...valid, ...changed }, account));
-  assert.throws(() => inspectRequest({ ...deploy(), mode: 'mainnet' }, account));
+  assert.equal(inspectRequest({ ...deploy(), mode: 'mainnet' }, account).kind, 'deploy');
+  assert.throws(() => inspectRequest({ ...deploy(), mode: 'mainnet', value: '1' }, account));
   assert.throws(() => inspectRequest({ ...deploy(), data: artifact.bytecode + '00' }, account));
 });
 
@@ -60,6 +61,63 @@ test('independent validation rejects wrong chains, code, nonce, balance, gas and
   await assert.rejects(signAndSubmit({ ...payload, summary: payload.summary.replace('USDC', 'wrong') }, { file, client }));
   assert.equal((await client.getTransactionCount({ address: account })), 0);
   assert.equal(publicFailure(new Error('secret-sentinel')).message.includes('secret-sentinel'), false);
+});
+
+test('mainnet approval identifies real funds, network 5042, and the five-USDC cumulative limit', () => {
+  const details = inspectRequest({ ...deploy(), mode: 'mainnet' }, account);
+  const text = approvalText({ nonce: 0, expiresAt: Date.now() + 60000 }, details);
+  assert.match(text, /部署同账主网合约/);
+  assert.match(text, /真实资金.*5042/);
+  assert.match(text, /累计预算上限：5 USDC/);
+  assert.doesNotMatch(text, /测试币/);
+});
+
+test('mainnet budget includes unresolved signed reservations and rejects missing or tampered costs', async () => {
+  const details = inspectRequest({ ...deploy(), mode: 'mainnet' }, account);
+  const path = join(directory, `nonce-mainnet-${account.toLowerCase()}-0.public.json`);
+  assert.equal((await checkMainnetBudget(file, details)).remaining, 5n * 10n ** 18n);
+  try {
+    await writeFile(path, JSON.stringify({ hash: `0x${'1'.repeat(64)}`, reservedCostWei: '4980000000000000000' }));
+    assert.equal((await checkMainnetBudget(file, details)).remaining, 20_000_000_000_000_000n);
+    await writeFile(path, JSON.stringify({ reservedCostWei: '4980000000000000001' }));
+    await assert.rejects(checkMainnetBudget(file, details), /超过授权的 5 USDC/);
+    await writeFile(path, JSON.stringify({ hash: `0x${'1'.repeat(64)}` }));
+    await assert.rejects(checkMainnetBudget(file, details));
+    await writeFile(path, JSON.stringify({ reservedCostWei: '-1' }));
+    await assert.rejects(checkMainnetBudget(file, details));
+    await checkMainnetBudget(file, inspectRequest(deploy(), account));
+  } finally { await unlink(path); }
+});
+
+test('chain-5042 signing deploys and pays only on an isolated EVM, with cumulative reservations and idempotent recovery', async () => {
+  const simulation = await network.connect('localArcMainnet');
+  const ephemeral = join(directory, 'mainnet-simulation-wallet.json');
+  const owner = (await createLocalWallet(ephemeral, password)).address;
+  const rpc = createPublicClient({ chain: arc, transport: custom(simulation.provider) });
+  const testWallet = createWalletClient({ chain: arc, transport: custom(simulation.provider) });
+  const recipient = (await testWallet.getAddresses())[1];
+  try {
+    await simulation.provider.request({ method: 'hardhat_setBalance', params: [owner, '0x4563918244f40000'] });
+    const deployment = { mode: 'mainnet', account: owner, data: artifact.bytecode, value: '0', ...fees };
+    const deployed = await signAndSubmit(await envelope(deployment, rpc, owner), { file: ephemeral, client: rpc });
+    const deployedReceipt = await rpc.waitForTransactionReceipt({ hash: deployed.hash });
+    assert.equal(deployedReceipt.status, 'success');
+    assert.equal((await rpc.getTransaction({ hash: deployed.hash })).chainId, 5042);
+    const address = deployedReceipt.contractAddress;
+    const before = await rpc.getBalance({ address: recipient });
+    const id = keccak256(toHex('isolated-mainnet-budget-test'));
+    const request = { mode: 'mainnet', account: owner, to: address, value: '10000000000000000', data: encodeFunctionData({ abi: artifact.abi, functionName: 'split', args: [[owner, recipient], [7_000_000_000_000_000n, 3_000_000_000_000_000n], id, 'isolated simulation'] }), ...fees };
+    const payload = await envelope(request, rpc, owner);
+    const paid = await signAndSubmit(payload, { file: ephemeral, client: rpc });
+    const receipt = await rpc.waitForTransactionReceipt({ hash: paid.hash });
+    verifyReceipt(receipt, { account: owner, contract: address, referenceId: id, note: 'isolated simulation', plan: { total: 10000n, payouts: [{ address: owner, nativeAmount: 7_000_000_000_000_000n }, { address: recipient, nativeAmount: 3_000_000_000_000_000n }] } });
+    assert.equal(await rpc.getBalance({ address: recipient }) - before, 3_000_000_000_000_000n);
+    const details = inspectRequest(request, owner);
+    assert.equal((await checkMainnetBudget(ephemeral, details)).reserved, 50_000_000_000_000_000n);
+    assert.equal((await signAndSubmit(payload, { file: ephemeral, client: rpc })).hash, paid.hash);
+    assert.equal((await checkMainnetBudget(ephemeral, details)).reserved, 50_000_000_000_000_000n);
+    assert.equal(await rpc.getTransactionCount({ address: owner }), 2);
+  } finally { await simulation.close(); }
 });
 
 test('an ephemeral encrypted wallet signs a real simulated-chain deployment and recovers the same hash', async () => {

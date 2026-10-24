@@ -1,8 +1,8 @@
-import { readFile, open, lstat } from 'node:fs/promises';
+import { readFile, open, lstat, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { decodeFunctionData, encodeFunctionData, formatUnits, getAddress, keccak256, toHex } from 'viem';
-import { chains, publicClient } from '../src/wallet.js';
+import { chains, publicClient, MAINNET_BUDGET_WEI } from '../src/wallet.js';
 import artifact from '../src/artifact.json' with { type: 'json' };
 import { NATIVE_PER_MICRO, SAMPLE_ADDRESSES } from '../src/split.js';
 import { defaultKeystore, walletAddress, withLocalWallet } from './local-wallet.mjs';
@@ -20,7 +20,7 @@ const integer = (value, name) => {
 
 export function inspectRequest(input, address) {
   if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(k => !fields.includes(k))) stop('交易字段不受支持。');
-  if (!Object.hasOwn(chains, input.mode)) stop('只支持 Arc 测试网与主网。');
+  if (typeof input.mode !== 'string' || !Object.hasOwn(chains, input.mode)) stop('只支持 Arc 测试网与主网。');
   if (input.account !== getAddress(address)) stop('付款账户与本机钱包不一致。');
   const { mode, account, data } = input;
   if (typeof data !== 'string' || !/^0x[0-9a-f]+$/i.test(data) || data.length > 24000 || data.length % 2) stop('交易数据格式无效。');
@@ -28,7 +28,7 @@ export function inspectRequest(input, address) {
   if (gas < 21000n || gas > 5_000_000n || maxFeePerGas < 20_000_000_000n || maxFeePerGas > 1_000_000_000_000n || maxPriorityFeePerGas > maxFeePerGas) stop('交易费用超出本机钱包支持范围。');
   let kind, to, referenceId, recipients = [], amounts = [], note = '';
   if (input.to == null) {
-    if (mode !== 'testnet' || value !== 0n || data.toLowerCase() !== artifact.bytecode.toLowerCase()) stop('只允许在测试网部署当前版本的同账合约。');
+    if (value !== 0n || data.toLowerCase() !== artifact.bytecode.toLowerCase()) stop('只允许部署当前版本的同账合约，部署转入金额必须为零。');
     kind = 'deploy';
   } else {
     try { to = getAddress(input.to); } catch { stop('合约地址无效。'); }
@@ -54,7 +54,7 @@ export function inspectRequest(input, address) {
 export function approvalText(intent, details) {
   const fee = details.gas * details.maxFeePerGas;
   return [
-    details.kind === 'deploy' ? '操作：部署同账测试网合约' : '操作：USDC 团队分账',
+    details.kind === 'deploy' ? `操作：部署同账${details.mode === 'mainnet' ? '主网' : '测试网'}合约` : '操作：USDC 团队分账',
     `网络：${details.mode === 'testnet' ? 'Arc 测试网 · 测试币' : 'Arc 主网 · 真实资金'}（${chains[details.mode].id}）`,
     `付款地址：${details.account}`,
     `合约地址：${details.to ?? '新建当前版本合约'}`,
@@ -63,6 +63,7 @@ export function approvalText(intent, details) {
     `备注：${JSON.stringify(details.note)}`,
     `网络费用上限：${formatUnits(fee, 18)} USDC`,
     `总支出上限：${formatUnits(details.value + fee, 18)} USDC`,
+    ...(details.mode === 'mainnet' ? ['本次本机签名累计预算上限：5 USDC；按每笔签名的最高支出保守预留，包含待核实交易。'] : []),
     `Gas 上限：${details.gas}；每 Gas 最高：${details.maxFeePerGas} wei`,
     `账户交易序号：${intent.nonce}`,
     `确认有效期至：${new Date(intent.expiresAt).toLocaleString('zh-CN', { hour12: false })}`,
@@ -86,6 +87,25 @@ export async function validateIntent(intent, address, client = publicClient(inte
 }
 
 const journalPath = (file, id) => join(dirname(file), `signed-${id.slice(2)}.public.json`);
+export async function checkMainnetBudget(file, details) {
+  if (details.mode !== 'mainnet') return;
+  const prefix = `nonce-mainnet-${details.account.toLowerCase()}-`;
+  let reserved = 0n;
+  for (const name of await readdir(dirname(file))) {
+    if (!name.startsWith(prefix) || !/^\d+\.public\.json$/.test(name.slice(prefix.length))) continue;
+    const path = join(dirname(file), name);
+    const stat = await lstat(path);
+    if (!stat.isFile() || stat.size > 8192) stop('主网预算记录异常，请人工核查。');
+    let entry;
+    try { entry = JSON.parse(await readFile(path, 'utf8')); } catch { stop('主网预算记录异常，请人工核查。'); }
+    const cost = integer(entry.reservedCostWei, '主网预算记录');
+    if (cost <= 0n || cost > MAINNET_BUDGET_WEI) stop('主网预算记录异常，请人工核查。');
+    reserved += cost;
+  }
+  if (reserved + details.value + details.gas * details.maxFeePerGas > MAINNET_BUDGET_WEI) stop('本次主网累计最高支出超过授权的 5 USDC，已停止签名。');
+  return { reserved, remaining: MAINNET_BUDGET_WEI - reserved };
+}
+
 export async function readSigned(file, details) {
   const path = journalPath(file, details.id);
   let json;
@@ -107,16 +127,18 @@ export async function signAndSubmit({ intent, summary, password }, { file = defa
   if (previous) return previous;
   client ??= publicClient(details.mode);
   const checked = await validateIntent(intent, address, client);
+  await checkMainnetBudget(file, details);
   if (summary !== checked.summary) stop('交易内容与确认窗口不一致，已停止签名。');
   return withLocalWallet(file, password, async wallet => {
     if (wallet.address !== address) stop('本机钱包文件已变化，已停止签名。');
     // Recheck after decryption; neither a stale password window nor another transaction may change the nonce.
     if (intent.expiresAt <= Date.now() || await client.getTransactionCount({ address, blockTag: 'pending' }) !== intent.nonce) stop('交易确认已失效，请重新核查。');
+    await checkMainnetBudget(file, details);
     const serializedTransaction = await wallet.signTransaction({ type: 2, chainId: chains[details.mode].id, nonce: intent.nonce, to: details.to, data: details.data, value: details.value, gasLimit: details.gas, maxFeePerGas: details.maxFeePerGas, maxPriorityFeePerGas: details.maxPriorityFeePerGas });
     const hash = keccak256(serializedTransaction);
     // Reserve this nonce even if broadcasting fails; another intent must not replace an unresolved signed payment.
     const guard = await open(join(dirname(file), `nonce-${details.mode}-${address.toLowerCase()}-${intent.nonce}.public.json`), 'wx', 0o600);
-    try { await guard.writeFile(JSON.stringify({ hash, fingerprint: details.fingerprint }) + '\n'); await guard.sync(); }
+    try { await guard.writeFile(JSON.stringify({ hash, fingerprint: details.fingerprint, reservedCostWei: (details.value + details.gas * details.maxFeePerGas).toString() }) + '\n'); await guard.sync(); }
     finally { await guard.close(); }
     // Persist the public hash BEFORE broadcasting so an interrupted response cannot trigger another payment.
     const handle = await open(journalPath(file, details.id), 'wx', 0o600);

@@ -1,0 +1,34 @@
+{
+  "status": "success",
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "transactionHash": "0x14532a73217a7fbc886ca202f53b7a659c165b9abc82c99f5d015b1439b0e704",
+  "contract": "0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622",
+  "payer": "0x34600E8FEDa068d265bD753F4aDE869f0BD28c18",
+  "recipient": "0xc3908a3740a35161b7204DE8a024b9DbB3e77a5c",
+  "totalUSDC": "1.98",
+  "payouts": [
+    {
+      "address": "0x34600E8FEDa068d265bD753F4aDE869f0BD28c18",
+      "USDC": "1.386"
+    },
+    {
+      "address": "0xc3908a3740a35161b7204DE8a024b9DbB3e77a5c",
+      "USDC": "0.594"
+    }
+  ],
+  "note": "同账主网分账验证",
+  "referenceId": "0xd5738b2e9681ec15b65c3bda1c95da64df125c97a6230e809e0d40edd0e1eef1",
+  "blockNumber": "27635363",
+  "blockTimestamp": "2026-10-24T14:04:00.000Z",
+  "feeUSDC": "0.0024312",
+  "payerBalanceUSDC": "1.392446625",
+  "recipientBalanceUSDC": "0.594",
+  "combinedRemainingUSDC": "1.986446625",
+  "totalMainnetGasSpentUSDC": "0.013553375",
+  "exactBalanceChangesVerified": true,
+  "contractBalanceUSDC": "0",
+  "mainnetEvidence": true,
+  "approval": "Wallet owner confirmed this exact payment in the local native window.",
+  "verifiedAt": "2026-10-24T14:05:57.159Z"
+}
