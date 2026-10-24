@@ -9,6 +9,7 @@ Native USDC payment splitting for small teams, with exact integer allocation, tr
 ## Verified demo / 已核实演示
 
 - [Source repository / 公开源码](https://github.com/zdfgu113/arc-split)
+- [Public app / 公开应用](https://arc-split-team-ledger.stillchair16.chatgpt.site)
 - [Arc Studio project / Studio 项目](https://studio.arc.io/app/7c4e4eec-0e7f-433b-ab84-b92b18606d70)
 - [Mainnet contract / 主网合约](https://explorer.arc.io/address/0x949C9d12d52636FbDa31EaD80457a7AB7c5b8622)
 - [Verified 1.98 USDC mainnet split / 已核实的 1.98 USDC 主网分账](https://explorer.arc.io/tx/0x14532a73217a7fbc886ca202f53b7a659c165b9abc82c99f5d015b1439b0e704)
@@ -97,7 +98,7 @@ node scripts/local-wallet.mjs address
 
 ### 用本机钱包运行同账
 
-已有钱包并完成备份后，双击 `Open-Local-App.cmd`，或运行 `npm run local`。启动器构建应用并打开 [本机同账](http://127.0.0.1:5178/)，保持服务进程运行。该地址只能在当前电脑访问。已发布的私有网页仍使用浏览器钱包，本机签名服务不通过公网开放。
+已有钱包并完成备份后，双击 `Open-Local-App.cmd`，或运行 `npm run local`。启动器构建应用并打开 [本机同账](http://127.0.0.1:5178/)，保持服务进程运行。该地址只能在当前电脑访问。公开托管版使用浏览器钱包，本机签名服务仅供当前电脑使用。
 
 1. 本机版自动选择测试网并显示完整公开地址与余额；连接不解锁钱包。使用“复制地址”和 [Circle 测试币页面](https://faucet.circle.com/) 领取测试币，人机验证由本人完成。
 2. 在合约设置中选择部署测试网合约。本机确认窗口显示网络编号、付款账户、费用上限与总支出上限；本人核对、勾选并输入创建钱包时的密码。
@@ -134,13 +135,13 @@ node scripts/local-wallet.mjs address
 
 项目包含本地准备的需求、合约参考与独立测试，以及 Arc Studio 内的应用构建与后续修订。合约逻辑参考是在本地准备并上传的，不能声称它完全由 Studio 从零独立创作。通过官方 CLI 的文件往返功能继续在 Studio 内迭代；保留真实记录，参赛资格最终由主办方判断。
 
-本机钱包接入包含后续本地修订与 Studio 文件往返；Windows 原生签名和真实测试网交易在本机验证。Studio 的模拟链测试不能替代 Windows 实测。`docs/studio-build-record.json` 的逐文件比较记录属于之前的发布版本，后续本机版本另行保存核验记录。已发布的私有网页仍为之前的版本。
+本机钱包接入包含后续本地修订与 Studio 文件往返；Windows 原生签名及真实测试网、主网交易均在本机确认和验证。Studio 的模拟链测试不能替代 Windows 实测。`docs/studio-build-record.json` 属于历史版本，最新主网修订的比较记录见 `docs/mainnet-studio-verification.json`。公开托管版已更新并通过匿名访问及浏览器行为检查。
 
 独立测试收款钱包可使用 `pwsh -NoProfile -STA -File scripts/Create-LocalWallet.ps1 -TestRecipient` 创建，固定保存为同一私有目录下的 `recipient-wallet-v3.json`，已有文件只验证，不覆盖。请为这个收款钱包单独备份加密文件与密码。
 
 已经核实的真实测试网合约部署见 `docs/testnet-deployment.json`。这些测试币没有真实货币价值，测试网部署不满足活动的主网付款要求。
 
-当前不是一份已经提交或获批的资助申请。主网部署和真实分账已核实；公开应用、包含主网交易的演示视频、领奖资格和正式申请仍需完成。
+当前不是一份已经提交或获批的资助申请。主网部署、真实分账和公开应用已核实；演示视频的油管链接、领奖资格核验和正式申请仍需完成。
 
 ## 范围与已知限制
 
